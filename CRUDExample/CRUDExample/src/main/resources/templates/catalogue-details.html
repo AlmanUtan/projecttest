@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Catalogue Details</title>
+</head>
+<body>
+<h1 th:text="${catalogue.catalogueName}"></h1>
+<p th:text="${catalogue.catalogueDescription}"></p>
+
+<h2>Products in this Catalogue</h2>
+
+<ul>
+    <li th:each="productCatalogue : ${catalogue.productCatalogues}">
+        <span th:text="${productCatalogue.product.productName}"></span>
+        <p th:text="${productCatalogue.product.productDescription}"></p>
+        <p>Price: $<span th:text="${productCatalogue.product.listPrice}"></span></p>
+    </li>
+</ul>
+
+<a href="/catalogues">Back to Catalogue List</a>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Catalogue List</title>
+</head>
+<body>
+<h1>All Catalogues</h1>
+
+<ul>
+    <li th:each="catalogue : ${catalogues}">
+        <a th:href="@{/catalogues/productcatalogues/{id}(id=${catalogue.catalogueId})}">
+            <span th:text="${catalogue.catalogueName}"></span>
+        </a>
+        <p th:text="${catalogue.catalogueDescription}"></p>
+    </li>
+</ul>
+</body>
+</html>
