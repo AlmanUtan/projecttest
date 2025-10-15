@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Saved Project</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<h1>Add Saved Project</h1>
+
+<form th:action="@{/employer/saved-projects/add}" method="post">
+    <div>
+        <label>Project:</label>
+        <select name="projectId" required>
+            <option value="">-- Select Project --</option>
+            <option th:each="p : ${projects}" th:value="${p.projectId}" th:text="${p.projectName}"></option>
+        </select>
+    </div>
+    <div>
+        <label>Notes:</label>
+        <textarea name="notes" rows="3" maxlength="500"></textarea>
+    </div>
+    <div>
+        <label>Status:</label>
+        <input type="text" name="status" maxlength="255"/>
+    </div>
+    <div>
+        <button type="submit">Save</button>
+        <a href="/employer/saved-projects">Cancel</a>
+    </div>
+</form>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Saved Projects</title>
+    <meta charset="UTF-8">
+    <style>
+        table { width:100%; border-collapse: collapse; }
+        th, td { padding: 8px; border: 1px solid #ddd; text-align: left; }
+        th { background: #f3f3f3; }
+        .actions form { display: inline-block; margin: 0 4px; }
+    </style>
+</head>
+<body>
+<h1>Saved Projects (Employer 3)</h1>
+
+<div>
+    <a href="/employer/saved-projects/add">Add Saved Project</a>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Project</th>
+        <th>Notes</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Last Viewed</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="sp : ${savedProjects}">
+        <td th:text="${sp.id}">1</td>
+        <td th:text="${sp.project != null ? sp.project.projectName : 'N/A'}">Project Name</td>
+        <td th:text="${sp.notes}">Notes</td>
+        <td th:text="${sp.status}">Status</td>
+        <td th:text="${sp.date}">2024-10-01</td>
+        <td th:text="${sp.lastViewed}">2024-10-15T09:30</td>
+        <td class="actions">
+            <a th:href="@{'/employer/saved-projects/edit/' + ${sp.id}}">Edit</a>
+
+            <form th:action="@{'/employer/saved-projects/view/' + ${sp.id}}" method="post">
+                <button type="submit">Mark Viewed</button>
+            </form>
+
+            <form th:action="@{'/employer/saved-projects/delete'}" method="post" onsubmit="return confirm('Delete this saved project?')">
+                <input type="hidden" name="id" th:value="${sp.id}"/>
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

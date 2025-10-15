@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Saved Project</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<h1>Edit Saved Project</h1>
+
+<form th:action="@{'/employer/saved-projects/edit/' + ${savedProject.id}}" method="post">
+    <div>
+        <label>Project:</label>
+        <select name="projectId" required>
+            <option th:each="p : ${projects}"
+                    th:value="${p.projectId}"
+                    th:selected="${p.projectId} == ${savedProject.project.projectId}"
+                    th:text="${p.projectName}">
+            </option>
+        </select>
+    </div>
+    <div>
+        <label>Notes:</label>
+        <textarea name="notes" rows="3" maxlength="500" th:text="${savedProject.notes}"></textarea>
+    </div>
+    <div>
+        <label>Status:</label>
+        <input type="text" name="status" maxlength="255" th:value="${savedProject.status}"/>
+    </div>
+    <div>
+        <button type="submit">Update</button>
+        <a href="/employer/saved-projects">Cancel</a>
+    </div>
+</form>
+</body>
+</html>
