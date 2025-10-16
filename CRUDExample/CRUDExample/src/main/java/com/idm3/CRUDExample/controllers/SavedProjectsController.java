@@ -2,24 +2,26 @@ package com.idm3.CRUDExample.controllers;
 
 import com.idm3.CRUDExample.model.SavedProject;
 import com.idm3.CRUDExample.service.SavedProjectService;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-@Controller
-@RequestMapping({"/employer/saved-projects", "/employer/saved-projects/"})
+import java.io.IOException;
+
+@Controller()
+@RequestMapping({"/employers", "/employer"})
 public class SavedProjectsController {
 
     @Autowired
     private SavedProjectService savedProjectService;
 
-    @GetMapping({"", "/"})
-    public ModelAndView list() {
-        ModelAndView mav = new ModelAndView("savedprojects-list");
-        mav.addObject("savedProjects", savedProjectService.listForEmployer());
-        return mav;
+    @RequestMapping(value = {"/allSavedProjects", ""})
+    public ModelAndView displayAllSavedProjects() {
+        return new ModelAndView("/savedprojects-list", "savedProjects", savedProjectService.listForEmployer());
     }
 
     @GetMapping("/add")
@@ -29,15 +31,6 @@ public class SavedProjectsController {
         return mav;
     }
 
-    @PostMapping("/add")
-    public ModelAndView add(
-            @RequestParam("projectId") @NotNull Long projectId,
-            @RequestParam(value = "notes", required = false) String notes,
-            @RequestParam(value = "status", required = false) String status
-    ) {
-        savedProjectService.create(projectId, notes, status);
-        return new ModelAndView("redirect:/employer/saved-projects");
-    }
 
     @GetMapping("/edit/{id}")
     public ModelAndView editForm(@PathVariable Long id) {
