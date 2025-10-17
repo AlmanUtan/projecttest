@@ -1,35 +1,54 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Edit Saved Project</title>
     <meta charset="UTF-8">
+    <title>Edit Saved Project</title>
+    <style>
+        .form { max-width: 600px; }
+        .field { margin-bottom: 12px; display: flex; flex-direction: column; }
+        label { font-weight: bold; }
+        .errors { color: red; }
+    </style>
 </head>
 <body>
 <h1>Edit Saved Project</h1>
 
-<form th:action="@{'/employer/saved-projects/edit/' + ${savedProject.id}}" method="post">
-    <div>
-        <label>Project:</label>
-        <select name="projectId" required>
-            <option th:each="p : ${projects}"
-                    th:value="${p.projectId}"
-                    th:selected="${p.projectId} == ${savedProject.project.projectId}"
-                    th:text="${p.projectName}">
-            </option>
-        </select>
+<div class="errors" th:if="${errors}">
+    <ul>
+        <li th:each="e : ${errors}" th:text="${e.defaultMessage}"></li>
+    </ul>
+</div>
+
+<form class="form" th:action="@{/savedprojects/update}" method="post" th:object="${savedProject}">
+    <input type="hidden" th:field="*{id}"/>
+
+    <div class="field">
+        <label for="employerId">EmployerID</label>
+        <input id="employerId" type="number" th:field="*{employerId}" required/>
     </div>
-    <div>
-        <label>Notes:</label>
-        <textarea name="notes" rows="3" maxlength="500" th:text="${savedProject.notes}"></textarea>
+    <div class="field">
+        <label for="projectId">ProjectID</label>
+        <input id="projectId" type="number" th:field="*{projectId}" required/>
     </div>
-    <div>
-        <label>Status:</label>
-        <input type="text" name="status" maxlength="255" th:value="${savedProject.status}"/>
+    <div class="field">
+        <label for="date">Date (DB-managed by default)</label>
+        <input id="date" type="date" th:value="${savedProject.date}" disabled/>
     </div>
-    <div>
-        <button type="submit">Update</button>
-        <a href="/employer/saved-projects">Cancel</a>
+    <div class="field">
+        <label for="lastViewed">Last Viewed</label>
+        <input id="lastViewed" type="datetime-local" th:field="*{lastViewed}"/>
     </div>
+    <div class="field">
+        <label for="notes">Notes</label>
+        <textarea id="notes" th:field="*{notes}" rows="3" maxlength="500"></textarea>
+    </div>
+    <div class="field">
+        <label for="status">Status</label>
+        <input id="status" type="text" th:field="*{status}" maxlength="255"/>
+    </div>
+
+    <button type="submit">Save</button>
+    <a href="/savedprojects">Cancel</a>
 </form>
 </body>
 </html>

@@ -13,54 +13,80 @@ import org.springframework.web.servlet.ModelAndView;
 import java.io.IOException;
 
 @Controller()
-@RequestMapping({"/employers", "/employer"})
+@RequestMapping(value = {"/saved", "/saved/"})
 public class SavedProjectsController {
 
     @Autowired
-    private SavedProjectService savedProjectService;
+    private SavedProjectService productService;
 
-    @RequestMapping(value = {"/allSavedProjects", ""})
-    public ModelAndView displayAllSavedProjects() {
-        return new ModelAndView("/savedprojects-list", "savedProjects", savedProjectService.listForEmployer());
+    @RequestMapping(value = {"/allProducts", ""})
+    public ModelAndView displayAllProducts() {
+        return new ModelAndView("/savedprojects-list", "products", productService.findAllProducts());
     }
-
     @GetMapping("/add")
-    public ModelAndView addForm() {
-        ModelAndView mav = new ModelAndView("savedprojects-add");
-        mav.addObject("projects", savedProjectService.allProjects());
-        return mav;
+    public ModelAndView showAddProductForm() {
+        return new ModelAndView("/savedprojects-add", "newProduct", new SavedProject());
     }
+    @PostMapping("/addProduct")
+    public ModelAndView addABook(@ModelAttribute("newProduct") SavedProject x,
+                                 @Valid SavedProject product, BindingResult result,
+                                 @RequestParam("productImageFile") MultipartFile file) {
 
+        // Check if there are validation errors
+        if (result.hasErrors()) {
+            return new ModelAndView("/savedprojects-add", "newProduct", product)
+                    .addObject("errors", result.getAllErrors());
+        }
+
+        else {
+
+
+            return new ModelAndView("redirect:/product/allProducts");
+        }
+    }
 
     @GetMapping("/edit/{id}")
-    public ModelAndView editForm(@PathVariable Long id) {
-        ModelAndView mav = new ModelAndView("savedprojects-edit");
-        SavedProject sp = savedProjectService.getById(id);
-        mav.addObject("savedProject", sp);
-        mav.addObject("projects", savedProjectService.allProjects());
-        return mav;
+    public ModelAndView showEditProductForm(@PathVariable("id") long id) {
+        if (productService.findOne(id).isEmpty())
+            return new ModelAndView("/error", "error", "Product not found");
+        else
+            return new ModelAndView("/savedprojects-edit", "aProduct", productService.findOne(id).get());
     }
 
-    @PostMapping("/edit/{id}")
-    public ModelAndView edit(
-            @PathVariable Long id,
-            @RequestParam("projectId") Long projectId,
-            @RequestParam(value = "notes", required = false) String notes,
-            @RequestParam(value = "status", required = false) String status
-    ) {
-        savedProjectService.update(id, projectId, notes, status);
-        return new ModelAndView("redirect:/employer/saved-projects");
+    @PostMapping("/saveProduct")
+    public ModelAndView saveOrUpdateProduct(@ModelAttribute("aProduct") SavedProject p, BindingResult result) {
+        System.out.println("product id " + p.getId() );
+        //if (result.hasErrors()) {
+        //   String viewName = (p.getId() == null) ? "/addProduct" : "/editProduct";
+        // return new ModelAndView(viewName);
+        //}
+
+        if (p.getId() == null) {
+            productService.saveProduct(p);
+        } else {
+            productService.updateProduct(p);
+        }
+
+        return new ModelAndView("redirect:/product");
     }
+
+
+
+
+
 
     @PostMapping("/delete")
-    public ModelAndView delete(@RequestParam("id") Long id) {
-        savedProjectService.delete(id);
-        return new ModelAndView("redirect:/employer/saved-projects");
+    public ModelAndView deleteProduct(@RequestParam("productId") long id) {
+        if (productService.findOne(id).isEmpty()){
+            return new ModelAndView("/error", "error", "Product not found");
+        } else {
+            productService.deleteByID(id);
+            return new ModelAndView("redirect:/product/");
+        }
     }
 
-    @PostMapping("/view/{id}")
-    public ModelAndView markViewed(@PathVariable Long id) {
-        savedProjectService.markViewed(id);
-        return new ModelAndView("redirect:/employer/saved-projects");
-    }
+
+
 }
+
+

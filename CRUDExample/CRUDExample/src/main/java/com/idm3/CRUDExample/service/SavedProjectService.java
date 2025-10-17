@@ -1,90 +1,74 @@
 package com.idm3.CRUDExample.service;
 
-import com.idm3.CRUDExample.model.Project;
 import com.idm3.CRUDExample.model.SavedProject;
-import com.idm3.CRUDExample.repository.ProjectRepository;
+
 import com.idm3.CRUDExample.repository.SavedProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
-
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
-
 @Service
+
+
 public class SavedProjectService {
 
-    private static final Long FIXED_EMPLOYER_ID = 3L; // single employer for prototype
-
     @Autowired
-    private SavedProjectRepository savedProjectRepository;
+    private SavedProjectRepository productRepository; // Retrieve all products
+    private static final String UPLOAD_DIR = "src/main/resources/static/assets/images/";
+    public List<SavedProject> findAllProducts() {
+        return productRepository.findAll();
 
-    @Autowired
-    private ProjectRepository projectRepository;
-
-    public List<SavedProject> listForEmployer() {
-        return savedProjectRepository.findByEmployerId(FIXED_EMPLOYER_ID);
+    }
+    public void saveProduct(SavedProject a) {
+        productRepository.save(a);
     }
 
-    public SavedProject getById(Long id) {
-        return savedProjectRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("SavedProject not found: " + id));
+
+
+    public Optional<SavedProject> findOne(long productId) {
+        return productRepository.findById(productId);
     }
 
-    public SavedProject create(Long projectId, String notes, String status) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new EntityNotFoundException("Project not found: " + projectId));
-
-        SavedProject sp = new SavedProject();
-        sp.setEmployerId(FIXED_EMPLOYER_ID);
-        sp.setProject(project);
-        sp.setDate(LocalDate.now());
-        sp.setLastViewed(null);
-        sp.setNotes(notes);
-        sp.setStatus(status);
-
-        return savedProjectRepository.save(sp);
+    public void deleteByID(long productId) {
+        productRepository.deleteById(productId);
     }
 
-    public SavedProject update(Long id, Long projectId, String notes, String status) {
-        SavedProject sp = getById(id);
-        if (!sp.getEmployerId().equals(FIXED_EMPLOYER_ID)) {
-            throw new EntityNotFoundException("SavedProject does not belong to employer");
+    public SavedProject updateProduct(SavedProject updatedProduct) {
+        System.out.println("repo *********" + updatedProduct.getId());
+        Optional<SavedProject> existingProduct = productRepository.findById(updatedProduct.getId());
+
+        if (existingProduct.isPresent()) {
+            SavedProject product = existingProduct.get();
+            product.setProjectId(updatedProduct.getProjectId());
+
+            product.setDate(updatedProduct.getDate());
+            product.setLastViewed(updatedProduct.getLastViewed());
+
+            product.setStatus(updatedProduct.getStatus());
+            productRepository.save(product);
+            return product;
+        } else {
+            throw new EntityNotFoundException("Product not found with id " + updatedProduct.getId());
         }
-        if (projectId != null && !projectId.equals(sp.getProject().getProjectId())) {
-            Project project = projectRepository.findById(projectId)
-                    .orElseThrow(() -> new EntityNotFoundException("Project not found: " + projectId));
-            sp.setProject(project);
-        }
-        sp.setNotes(notes);
-        sp.setStatus(status);
-        return savedProjectRepository.save(sp);
     }
 
-    public void delete(Long id) {
-        SavedProject sp = getById(id);
-        if (!sp.getEmployerId().equals(FIXED_EMPLOYER_ID)) {
-            throw new EntityNotFoundException("SavedProject does not belong to employer");
-        }
-        savedProjectRepository.delete(sp);
-    }
 
-    public SavedProject markViewed(Long id) {
-        SavedProject sp = getById(id);
-        sp.setLastViewed(LocalDateTime.now());
-        return savedProjectRepository.save(sp);
-    }
 
-    public List<Project> allProjects() {
-        return projectRepository.findAll();
-    }
+
+
+
+
+
 }
+
+
+
+
+
